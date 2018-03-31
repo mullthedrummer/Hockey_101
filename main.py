@@ -34,15 +34,21 @@ TimeZone=[]
 FirstYearOfPlay=[]
 Division=[]
 Conference=[]
-### Create lists for each column based on JSON information
-for id in range(1,31):
-    team_FranchiseID.append(teamData['teams'][id]['franchise']['franchiseId'])
-    TeamName.append(teamData['teams'][id]['name'])
-    City.append(teamData['teams'][id]['venue']['city'])
-    TimeZone.append(teamData['teams'][id]['venue']['timeZone']['tz'])
-    FirstYearOfPlay.append(teamData['teams'][id]['firstYearOfPlay'])
-    Division.append(teamData['teams'][id]['division']['name'])
-    Conference.append(teamData['teams'][id]['conference']['name'])
+PlayerID=[]
+
+### Populate lists for each column based on JSON information
+for id_team in range(0,31):
+    team_FranchiseID.append(teamData['teams'][id_team]['id'])
+    TeamName.append(teamData['teams'][id_team]['name'])
+    City.append(teamData['teams'][id_team]['venue']['city'])
+    TimeZone.append(teamData['teams'][id_team]['venue']['timeZone']['tz'])
+    FirstYearOfPlay.append(teamData['teams'][id_team]['firstYearOfPlay'])
+    Division.append(teamData['teams'][id_team]['division']['name'])
+    Conference.append(teamData['teams'][id_team]['conference']['name'])
+
+    ### Save off Player ID's into a list for each player on Actvie Rosters
+    for id_player in range(1,len(teamData['teams'][id_team]['roster']['roster'])):
+        PlayerID.append(teamData['teams'][id_team]['roster']['roster'][id_player]['person']['id'])
 
 ### Create DataFrame of team information
 teams = {'FranchiseID': team_FranchiseID,
@@ -56,8 +62,103 @@ teams = {'FranchiseID': team_FranchiseID,
 
 teams_pd = pd.DataFrame(teams)
 
+del(team_FranchiseID, TeamName,City,TimeZone,FirstYearOfPlay,Division,Conference,
+    url_Team_Information, response, teamData)
+
+### Pull information from API, requires to be run for each player loop
+url_Team_Information = "https://statsapi.web.nhl.com/api/v1/people/"
+
+
+### Create empty lists to store json information
+First_Name = []
+Last_Name = []
+DOB = []
+Age = []
+BirthPlace = []
+BirthCountry = []
+Nationality = []
+Height = []
+Weight = []
+Active = []
+alternateCaptain = []
+Captain = []
+Rookie = []
+ShootsCatches = []
+Team_ID = []
+Team_name = []
+Number = []
+Position = []
+Position_Type = []
+Position_Abb = []
+
+### Populate lists for each column based on JSON information
+for id_Player in PlayerID:
+    print(id_Player)
+    ### Loop through each player ID and adjust url to point at right page
+    url_Team_Information_modded = url_Team_Information+str(id_Player)
+    response = urllib.urlopen(url_Team_Information_modded)
+    peopleData = json.loads(response.read())
+
+    ### Populate lists for each column based on JSON information
+    First_Name.append(peopleData['people'][0]['firstName'])
+    Last_Name.append(peopleData['people'][0]['lastName'])
+    DOB.append(peopleData['people'][0]['birthDate'])
+    Age.append(peopleData['people'][0]['currentAge'])
+    BirthPlace.append(peopleData['people'][0]['birthCity'])
+    BirthCountry.append(peopleData['people'][0]['birthCountry'])
+    Nationality.append(peopleData['people'][0]['nationality'])
+    Height.append(peopleData['people'][0]['height'])
+    Weight.append(peopleData['people'][0]['weight'])
+    Active.append(peopleData['people'][0]['active'])
+    alternateCaptain.append(peopleData['people'][0]['alternateCaptain'])
+    Captain.append(peopleData['people'][0]['captain'])
+    Rookie.append(peopleData['people'][0]['rookie'])
+    ShootsCatches.append(peopleData['people'][0]['shootsCatches'])
+    Team_ID.append(peopleData['people'][0]['currentTeam']['id'])
+    Team_name.append(peopleData['people'][0]['currentTeam']['name'])
+    #Number.append(peopleData['people'][0]['primaryNumber'])
+    Position.append(peopleData['people'][0]['primaryPosition']['name'])
+    Position_Type.append(peopleData['people'][0]['primaryPosition']['type'])
+    Position_Abb.append(peopleData['people'][0]['primaryPosition']['abbreviation'])
+
+
+### Create DataFrame of roster information
+rosters = {
+            'First_Name' : First_Name,
+            'Last_Name' : Last_Name,
+            'DOB' : DOB,
+            'Age' : Age,
+            'BirthPlace' : BirthPlace,
+            'BirthCountry' : BirthCountry,
+            'Nationality' : Nationality,
+            'Height' : Height,
+            'Weight' : Weight,
+            'Active' : Active,
+            'alternateCaptain' : alternateCaptain,
+            'Captain' : Captain,
+            'Rookie' : Rookie,
+            'ShootsCatches' : ShootsCatches,
+            'Team_ID' : Team_ID,
+            'Team_name' : Team_name,
+        #    'Number' : Number,
+            'Position' : Position,
+            'Position_Type' : Position_Type,
+            'Position_Abb' : Position_Abb
+            }
+
+rosters_pd = pd.DataFrame(rosters)
+
+print(rosters_pd)
+
+
 ### Clean up un-needed lists
-del(team_FranchiseID, TeamName,City,TimeZone,FirstYearOfPlay,Division,Conference)
+del(First_Name, Last_Name, DOB, Age, BirthPlace, BirthCountry, Nationality, Height, Weight,
+    alternateCaptain, Captain, Rookie, ShootsCatches, Team_ID, Team_name, Position, Position_Type,
+    Position_Abb)
+
 
 ### END: Build out Team Information
 ####################
+
+###################
+### Build out Roster Information
