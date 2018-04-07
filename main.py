@@ -14,15 +14,21 @@ import numpy as np
 import matplotlib.pyplot as plt
 import urllib, json, ast
 from team_info import team_Information_Function
-
-
+from roster_information import team_Roster_Function
 
 
 ####################
+### Team Information and Player ID's used for Rosters and Stats
+
+team_Information, PlayerID = team_Information_Function()
+
+### END: Team Information and Player ID's used for Rosters and Stats
 ####################
-### Team Information and Rosters
 
-team_Information, team_Roster_Information = team_Information_Function()
+####################
+### Team Rosters
 
-### END: Team Information and Rosters
+roster_Information = team_Roster_Function(PlayerID)
+
+### END: Team Rosters
 ####################
